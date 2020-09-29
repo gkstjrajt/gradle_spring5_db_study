@@ -1,12 +1,18 @@
 package gradle_spring5_db_study.spring;
 
-import java.util.Collection;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,16 +31,42 @@ public class MemberDao {
 	}
 
 	public void insert(Member member) {
+		PreparedStatementCreator psc = new PreparedStatementCreator() {
+			
+			@Override
+			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+				PreparedStatement pstmt = con.prepareStatement("INSERT INTO MEMBER(EMAIL, PASSWORD, NAME, REGDATE) VALUES(?, ?, ?, ?)");
+				
+				pstmt.setString(1, member.getEmail());
+				pstmt.setString(2, member.getPassword());
+				pstmt.setString(3, member.getName());
+				pstmt.setTimestamp(4, Timestamp.valueOf(member.getRegisterDateTime()));
+				return pstmt;
+			}
+		};
 		
 	}
 
 	public void update(Member member) {
-		
+		String sql = "UPDATE MEMBER SET NAME=?, PASSWORD=? WHERE EMAIL=?";
+		jdbcTemplate.update(sql, member.getName(), member.getPassword(), member.getEmail());
 	}
 
-	public Collection<Member> selectAll() {
+	public List<Member> selectAll() {
 		String sql = "SELECT ID, EMAIL, PASSWORD, NAME, REGDATE FROM MEMBER";
-		return (Collection<Member>) jdbcTemplate.query(sql, new MemberRowMapper());
+		return jdbcTemplate.query(sql, new MemberRowMapper());
+	}
+	
+	public void delete(Member member) {
+		PreparedStatementCreator psc = new PreparedStatementCreator() {
+			
+			@Override
+			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+				PreparedStatement pstmt = con.prepareStatement("DELETE FROM MEMBER WHERE EMAIL=?");
+				pstmt.setString(1, member.getEmail());
+				return pstmt;
+			}
+		};
 	}
 
 }

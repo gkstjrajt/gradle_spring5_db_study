@@ -16,7 +16,10 @@ public class Member {
         this.registerDateTime = registerDateTime;
     }
 
-    public Long getId() {
+    public Member() {
+	}
+
+	public Long getId() {
         return id;
     }
 

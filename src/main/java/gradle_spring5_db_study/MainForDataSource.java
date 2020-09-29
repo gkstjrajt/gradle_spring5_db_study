@@ -1,5 +1,7 @@
 package gradle_spring5_db_study;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
 
@@ -20,15 +22,23 @@ public class MainForDataSource {
 			System.out.println(ds);
 			memberDao = ctx.getBean(MemberDao.class);
 			
-			selectByEmail();
+			
+			selectAll();
+			insertMember();
+			selectAll();
+			updateMember();
+			selectAll();
+			deleteMember();
 			selectAll();
 		}
 	}
 
 	private static void selectAll() {
 		System.out.println("selectAll()");
-		Collection<Member> member = memberDao.selectAll();
-		System.out.println(member);
+		List<Member> members = memberDao.selectAll();
+		for(Member member : members) {
+			System.out.printf("%d : %s : %s%n", member.getId(), member.getEmail(), member.getName());
+		}
 		
 	}
 
@@ -36,5 +46,33 @@ public class MainForDataSource {
 		System.out.println("selectByEmail()");
 		Member member = memberDao.selectByEmail("test@test.co.kr");
 		System.out.printf("%d : %s : %s%n",member.getId(),member.getEmail(),member.getName());
+	}
+	
+	private static void updateMember() {
+		System.out.println("-------------Update Member");
+		Member member = memberDao.selectByEmail("test@test.co.kr");
+		String oldPw = member.getPassword();
+		String newPw = Double.toHexString(Math.random());
+		member.changePassword(oldPw, newPw);
+		
+		memberDao.update(member);
+		System.out.println("암호변경 : " + oldPw + " > " + newPw);
+		System.out.println(member.getId() + "데이터 삭제");
+	}
+	
+	private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMddHHmmss");
+	
+	private static void insertMember() {
+		System.out.println("------------- Insert Member");
+		String prefix = formatter.format(LocalDateTime.now());
+		Member member = new Member("test3" + "@test.co.kr", "1111", "1111", LocalDateTime.now());
+		memberDao.insert(member);
+		System.out.println(member.getId() + " 데이터 추가");
+	}
+	
+	private static void deleteMember() {
+		System.out.println("----------- Delete Member");
+		Member member = memberDao.selectByEmail("test@test.co.kr");
+		memberDao.delete(member);
 	}
 }
