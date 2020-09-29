@@ -5,7 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 @Configuration
-@ComponentScan(basePackages = { "gradle_spring5_db_study.spring" })
+@ComponentScan(basePackages = { "gradle_spring5_db_study.spring",
+		"gradle_spring5_db_study.spring.mapper"})
 @Import({ContextDataSource.class, ContextSqlSession.class})
 public class AppCtx {
 	

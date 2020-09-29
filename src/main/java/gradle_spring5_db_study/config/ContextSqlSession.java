@@ -1,5 +1,7 @@
 package gradle_spring5_db_study.config;
 
+import java.io.IOException;
+
 import javax.sql.DataSource;
 
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -12,16 +14,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@MapperScan(basePackages = {"gradle_spring5_db_study.mapper"})
+@MapperScan(basePackages = {"gradle_spring5_db_study.spring.mapper"})
 public class ContextSqlSession {
 	@Autowired
 	private ApplicationContext applicationContext;
 	@Bean
-	public SqlSessionFactoryBean sqlSessionFactoryBean(DataSource dataSource) {
+	public SqlSessionFactoryBean sqlSessionFactoryBean(DataSource dataSource) throws IOException {
 		SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
 		factoryBean.setDataSource(dataSource);
 		factoryBean.setConfigLocation(applicationContext.getResource("classpath:/mybatis-config.xml"));
-//		factoryBean.setMapperLocations(applicationContext.getResource("classpath:/mappers/*Mapper.xml"));
+		factoryBean.setMapperLocations(applicationContext.getResources("classpath:/mappers/*Mapper.xml"));
 		
 		return factoryBean;
 	}
